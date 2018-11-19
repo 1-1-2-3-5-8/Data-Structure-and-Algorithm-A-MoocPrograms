@@ -1,0 +1,109 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+#define MAXSIZE 1000
+
+template <class T>
+struct stack
+{
+	int size;
+	T s[MAXSIZE];
+	stack() :size(-1) {}
+	bool empty()
+	{
+		return size < 0;
+	}
+	void push(T t)
+	{
+		s[++size] = t;
+	}
+	T top()
+	{
+		return s[size];
+	}
+	T pop()
+	{
+		return s[size--];
+	}
+};
+
+struct material
+{
+	char name[MAXSIZE];
+	material *child, *sibling;
+	material(char *n) :child(0), sibling(0)
+	{
+		strcpy(name, n);
+	}
+};
+
+int n;
+bool found;
+material* find(char *name, material* root)
+{
+	if (!strcmp(root->name, name))
+	{
+		found = 1;
+		return root;
+	}
+	material* tmp;
+	if (!found&&root->child)
+		tmp = find(name, root->child);
+	if (tmp)
+		return tmp;
+	if (!found&&root->sibling)
+		return find(name, root->sibling);
+}
+
+int main()
+{
+	scanf("%d", &n);
+	char input[MAXSIZE];
+	cin.getline(input, MAXSIZE - 1);
+	while (n--)
+	{
+		material* root = new material("\0");
+		stack<material*> st;
+		material *mov = root;
+		while (cin.getline(input, MAXSIZE - 1) && input[0] != '\0')
+		{
+			if (input[0] == '{')
+			{
+				st.push(mov);
+				mov->child = new material("\0");
+				mov = mov->child;
+			}
+			else if (input[0] == '}')
+				mov = st.pop();
+			else
+			{
+				if (strlen(mov->name) > 0)
+				{
+					mov->sibling = new material(input);
+					mov = mov->sibling;
+				}
+				else
+					strcpy(mov->name, input);
+			}
+		}
+		found = 0;
+		cin.getline(input, MAXSIZE - 1);
+		material* tar = find(input, root);
+		if (!found)
+			printf("No\n");
+		else
+		{
+			while (tar->sibling)
+			{
+				printf("%s", tar->sibling->name);
+				tar = tar->sibling;
+			}
+			printf("\n");
+		}
+		cin.getline(input, MAXSIZE - 1);
+		cin.getline(input, MAXSIZE - 1);
+	}
+	cin.getline(input, MAXSIZE - 1);
+	return 0;
+}

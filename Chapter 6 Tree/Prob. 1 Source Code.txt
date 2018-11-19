@@ -1,0 +1,63 @@
+#include <stdio.h>
+using namespace std;
+
+#define MAXSIZE 100
+
+struct pt
+{
+	int l, r;
+};
+
+struct ele
+{
+	pt nd;
+	int dep;
+	ele() {}
+	ele(pt t, int d) :nd(t), dep(d) {}
+};
+
+struct queue
+{
+	int front, last;
+	ele que[MAXSIZE];
+	queue() :front(0), last(0) {}
+	bool empty()
+	{
+		return front >= last;
+	}
+	void push(ele t)
+	{
+		que[last++] = t;
+	}
+	ele top()
+	{
+		return que[front];
+	}
+	ele pop()
+	{
+		return que[front++];
+	}
+};
+
+pt node[20];
+int n;
+
+int main()
+{
+	scanf("%d", &n);
+	for (int i = 1; i <= n; i++)
+		scanf("%d%d", &node[i].l, &node[i].r);
+	queue que;
+	que.push(ele(node[1], 1));
+	ele now;
+	while (!que.empty())
+	{
+		now = que.pop();
+		if (now.nd.l > 0)
+			que.push(ele(node[now.nd.l], now.dep + 1));
+		if (now.nd.r > 0)
+			que.push(ele(node[now.nd.r], now.dep + 1));
+	}
+	printf("%d\n", now.dep);
+	return 0;
+}
