@@ -1,0 +1,137 @@
+/* Minimum Arborescence Problem
+ * Zhu-Liu Algorithm
+ * Time Complexity: O(VE)
+ */
+#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+#define MAXV 200
+#define MAXL (1 << 30)
+
+typedef struct
+{
+	int x, y;
+} coordinate;
+typedef double matrix[MAXV][MAXV]; //Weight of edge from j to i
+
+int n, m;
+coordinate vertex[MAXV];
+matrix edge;
+
+void calc()
+{
+	double res = 0;
+	bool exclusive[MAXV] = {}; //whether it has been combined into another vertex
+	while (true)
+	{
+		/* Calculate minimum in-edge of every vertex */
+		int prev[MAXV];
+		for (int i = 2; i <= n; i++)
+		{
+			if (exclusive[i]) //i hasn't been combined
+				continue;
+			int pre = i;
+			double maxl = MAXL;
+			for (int j = 1; j <= n; j++)
+			{
+				if (j != i //Do not consider self-circle
+					&& !exclusive[j] //j hasn't been combined
+					&& edge[i][j] < maxl)
+				{
+					maxl = edge[i][j];
+					pre = j;
+				}
+			}
+			if (pre == i)
+			{
+				printf("NO\n");
+				return;
+			}
+			prev[i] = pre;
+		}
+		/* Decide circle existence */
+		int i;
+		for (i = 2; i <= n; i++)
+		{
+			if (exclusive[i])
+				continue;
+			int step = 0;
+			int j = prev[i];
+			while (j != 1 && j != i 
+				&& step < n) //d in case a->b->c->(a&d) is not in a circle
+			{
+				j = prev[j];
+				step++;
+			}
+			if (j == i) //Find a circle
+				break;
+		}
+		/* Sum edge weights as the answer when no circle exists */
+		if (i > n)
+		{
+			for (int j = 2; j <= n; j++)
+			{
+				if (exclusive[j])
+					continue;
+				res += edge[j][prev[j]];
+			}
+			printf("%.2lf\n", res);
+			return;
+		}
+		/* Combine vertex in a circle into one vertex i */
+		bool incircle[MAXV] = {};
+		incircle[i] = 1;
+		int j = prev[i];
+		res += edge[i][j];
+		while (j != i)
+		{
+			res += edge[j][prev[j]];
+			exclusive[j] = 1;
+			incircle[j] = 1;
+			j = prev[j];
+		}
+		for (int j = 2; j <= n; j++) //for every j in circle
+		{
+			if (!incircle[j])
+				continue;
+			for (int k = 2; k <= n; k++) //for every k in circle
+			{
+				if (incircle[k])
+					continue;
+				/* Upload weight of edge of circle to vertex k */
+				if (edge[k][j] < edge[k][i])
+					edge[k][i] = edge[k][j];
+				/* Upload weight of edge of vertex k to circle */
+				if (edge[j][k] < MAXL
+					&&edge[j][k] - edge[j][prev[j]] < edge[i][k])
+					edge[i][k] = edge[j][k] - edge[j][prev[j]];
+			}
+		}
+	}
+}
+
+int main()
+{
+	while (cin >> n >> m)
+	{
+		for (int i = 1; i <= n; i++)
+			for (int j = 1; j <= n; j++)
+				edge[i][j] = MAXL;
+		for (int i = 1; i <= n; i++)
+			scanf("%d%d", &vertex[i].x, &vertex[i].y);
+		int s, e;
+		for (int i = 0; i < m; i++)
+		{
+			scanf("%d%d", &s, &e);
+			int x1 = vertex[s].x, y1 = vertex[s].y;
+			int x2 = vertex[e].x, y2 = vertex[e].y;
+			int square = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
+			double dist = sqrt(double(square));
+			edge[e][s] = dist;
+		}
+		calc();
+	}
+	return 0;
+}
