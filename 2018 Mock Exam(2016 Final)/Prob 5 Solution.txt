@@ -15,12 +15,9 @@ void calnext(char* s)
 	for (int i = 1; i <= len; i++)
 	{
 		int k = nxt[i - 1];
-		while (k > 0 && s[i - 1] != s[k])
+		while (k >= 0 && s[i - 1] != s[k])
 			k = nxt[k];
-		if (s[k] == s[i - 1])
-			nxt[i] = k + 1;
-		else
-			nxt[i] = 0;
+		nxt[i] = k + 1;
 	}
 }
 
