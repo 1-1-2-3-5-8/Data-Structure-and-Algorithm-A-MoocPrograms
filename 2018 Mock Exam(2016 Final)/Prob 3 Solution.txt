@@ -1,0 +1,82 @@
+/* Binary Search */
+#include <iostream>
+#include <string.h>
+#include <algorithm>
+using namespace std;
+
+#define MAXL 100
+#define MAXN 100010
+
+struct item
+{
+	char key[MAXL];
+	char value[MAXL];
+	friend bool operator< (const item& a, const item& b)
+	{
+		return strcmp(a.key, b.key) < 0;
+	}
+};
+
+struct itemp
+{
+	item* p;
+	friend bool operator< (itemp a, itemp b)
+	{
+		return *(a.p) < *(b.p);
+	}
+};
+
+item dic[MAXN];
+itemp ind[MAXN];
+int n = 0;
+
+void bisearch(char* word)
+{
+	int l = -1, r = n;
+	while (r - l > 1)
+	{
+		int mid = (l + r) / 2;
+		int res = strcmp(word, ind[mid].p->key);
+		if (!res)
+		{
+			r = mid;
+			break;
+		}
+		if (res > 0)
+			l = mid;
+		else
+			r = mid;
+	}
+	if (strcmp(word, ind[r].p->key))
+		printf("eh\n");
+	else
+		printf("%s\n", ind[r].p->value);
+}
+
+int main()
+{
+	char input[MAXL];
+	char c;
+	while (scanf("%s", dic[n].value) > 0)
+	{
+		scanf("%c", &c);
+		if (c == ' ')
+		{
+			scanf("%s", dic[n].key);
+			ind[n].p = dic + n;
+			n++;
+		}
+		else
+		{
+			strcpy(input, dic[n].value);
+			dic[n].key[0] = dic[n].value[0] = '\0';
+			ind[n].p = dic + n;
+			break;
+		}
+	}
+	sort(ind, ind + n);
+	bisearch(input);
+	while (scanf("%s", input) > 0)
+		bisearch(input);
+	return 0;
+}

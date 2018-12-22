@@ -1,0 +1,49 @@
+/* KMP */
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+#define MAXL 400010
+
+char name[MAXL];
+int nxt[MAXL];
+int len;
+
+void calnext(char* s) 
+{
+	nxt[0] = -1;
+	for (int i = 1; i <= len; i++)
+	{
+		int k = nxt[i - 1];
+		while (k > 0 && s[i - 1] != s[k])
+			k = nxt[k];
+		if (s[k] == s[i - 1])
+			nxt[i] = k + 1;
+		else
+			nxt[i] = 0;
+	}
+}
+
+int com[MAXL];
+int comn;
+
+int main()
+{
+	while (scanf("%s", name) > 0)
+	{
+		len = strlen(name);
+		calnext(name);
+		comn = 0;
+		int c = len;
+		while (c > 0)
+		{
+			com[comn] = c;
+			comn++;
+			c = nxt[c];
+		}
+		for (int i = comn - 1; i > 0; i--)
+			printf("%d ", com[i]);
+		printf("%d\n", com[0]);
+	}
+	return 0;
+}

@@ -1,0 +1,61 @@
+/* Ïß¶ÎÊ÷ */
+#include <iostream>
+using namespace std;
+
+#define MAXN (1 << 20)
+#define INF 0x7fffffff
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
+int n, k;
+int maxtree[MAXN * 2];
+int mintree[MAXN * 2];
+
+int findmax(int a, int b, int node, int l, int r)
+{
+	if (r <= a || l >= b)
+		return -INF;
+	if (l >= a && r <= b)
+		return maxtree[node];
+	int lmax = findmax(a, b, node * 2 + 1, l, (l + r) / 2);
+	int rmax = findmax(a, b, node * 2 + 2, (l + r) / 2, r);
+	return MAX(lmax, rmax);
+}
+
+int findmin(int a, int b, int node, int l, int r)
+{
+	if (r <= a || l >= b)
+		return INF;
+	if (l >= a && r <= b)
+		return mintree[node];
+	int lmin = findmin(a, b, node * 2 + 1, l, (l + r) / 2);
+	int rmin = findmin(a, b, node * 2 + 2, (l + r) / 2, r);
+	return MIN(lmin, rmin);
+}
+
+int main()
+{
+	scanf("%d%d", &n, &k);
+	for (int i = 0; i < 2 * MAXN; i++)
+	{
+		maxtree[i] = -INF;
+		mintree[i] = INF;
+	}
+	for (int i = MAXN - 1; i < MAXN + n - 1; i++)
+	{
+		scanf("%d", maxtree + i);
+		mintree[i] = maxtree[i];
+	}
+	for (int i = MAXN - 2; i >= 0; i--)
+	{
+		mintree[i] = MIN(mintree[2 * i + 1], mintree[2 * i + 2]);
+		maxtree[i] = MAX(maxtree[2 * i + 1], maxtree[2 * i + 2]);
+	}
+	for (int i = 0; i < n - k; i++)
+		printf("%d ", findmin(i, i + k, 0, 0, MAXN));
+	printf("%d\n", findmin(n - k, n, 0, 0, MAXN));
+	for (int i = 0; i < n - k; i++)
+		printf("%d ", findmax(i, i + k, 0, 0, MAXN));
+	printf("%d\n", findmax(n - k, n, 0, 0, MAXN));
+	return 0;
+}

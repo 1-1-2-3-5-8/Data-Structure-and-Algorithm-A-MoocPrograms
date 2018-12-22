@@ -1,0 +1,102 @@
+/* Dijkstra + DP */
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+#define MAXN 1010
+#define MAXC 110
+#define INF 0x7fffffff
+
+struct ele
+{
+	int end;
+	int oil;
+	int price;
+	ele(int e, int o, int p) :end(e), oil(o), price(p) {}
+	friend bool operator> (ele a, ele b)
+	{
+		return a.price > b.price;
+	}
+};
+
+struct edge
+{
+	int e;
+	int d;
+	edge(int end, int dis) :e(end), d(dis) {}
+};
+
+int n, m;
+int p[MAXN];
+int f[MAXN][MAXC];
+vector<edge> v[MAXN];
+
+int dijkstra(int s, int e, int c)
+{
+	priority_queue<ele, vector<ele>, greater<ele> > que;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j <= c; j++)
+			f[i][j] = INF;
+	f[s][0] = 0;
+	que.push(ele(s, 0, 0));
+	while (!que.empty())
+	{
+		ele pt = que.top();
+		que.pop();
+		int now = pt.end;
+		int oil = pt.oil;
+		int price = pt.price;
+		if (now == e)
+			return price;
+		if (price > f[now][oil])
+			continue;
+		//待在原地加一升油
+		if (oil < c&&price + p[now] < f[now][oil + 1])
+		{
+			f[now][oil + 1] = price + p[now];
+			que.push(ele(now, oil + 1, f[now][oil + 1]));
+		}
+		int size = v[now].size();
+		//或者到所有现在的油量能到的相邻的结点
+		for (int i = 0; i < size; i++)
+		{
+			edge& e = v[now][i];
+			if (oil >= e.d)
+			{
+				if (price < f[e.e][oil - e.d])
+				{
+					f[e.e][oil - e.d] = price;
+					que.push(ele(e.e, oil - e.d, price));
+				}
+			}
+		}
+	}
+	return -1;
+}
+
+int main()
+{
+	scanf("%d%d", &n, &m);
+	for (int i = 0; i < n; i++)
+		scanf("%d", p + i);
+	int s, e, c;
+	for (int i = 0; i < m; i++)
+	{
+		scanf("%d%d%d", &s, &e, &c);
+		v[s].push_back(edge(e, c));
+		v[e].push_back(edge(s, c));
+	}
+	int q;
+	scanf("%d", &q);
+	while (q--)
+	{
+		scanf("%d%d%d", &c, &s, &e);
+		int res = dijkstra(s, e, c);
+		if (res >= 0)
+			printf("%d\n", res);
+		else
+			printf("impossible\n");
+	}
+	return 0;
+}

@@ -1,0 +1,118 @@
+5:Cartesian Tree
+查看 提交 统计 提问
+总时间限制: 10000ms 单个测试点时间限制: 2000ms 内存限制: 65536kB
+描述
+Let us consider a special type of a binary search tree, called a cartesian tree. Recall that a binary search tree is a rooted ordered binary tree, such that for its every node x the following condition is satisfied: each node in its left subtree has the key less then the key of x, and each node in its right subtree has the key greater then the key of x.
+That is, if we denote left subtree of the node x by L(x), its right subtree by R(x) and its key by kx then for each node x we have
+
+if y ∈ L(x) then ky < kx
+
+if z ∈ R(x) then kz > kx
+
+
+The binary search tree is called cartesian if its every node x in addition to the main key kx also has an auxiliary key that we will denote by ax, and for these keys the heap condition is satisfied, that is
+
+if y is the parent of x then ay < ax
+
+
+Thus a cartesian tree is a binary rooted ordered tree, such that each of its nodes has a pair of two keys (k, a) and three conditions described are satisfied.
+Given a set of pairs, construct a cartesian tree out of them, or detect that it is not possible.
+
+代码填空
+
+}
+
+输入
+The first line of the input file contains an integer number N -- the number of pairs you should build cartesian tree out of (1 <= N <= 50 000). The following N lines contain two numbers each -- given pairs (ki, ai). For each pair |ki|, |ai| <= 30 000. All main keys and all auxiliary keys are different, i.e. ki != kj and ai != aj for each i != j.
+输出
+On the first line of the output file print YES if it is possible to build a cartesian tree out of given pairs or NO if it is not. If the answer is positive, on the following N lines output the tree. Let nodes be numbered from 1 to N corresponding to pairs they contain as they are given in the input file. For each node output three numbers -- its parent, its left child and its right child. If the node has no parent or no corresponding child, output 0 instead.
+The input ensure these is only one possible tree.
+样例输入
+7
+5 4
+2 2
+3 9
+0 5
+1 3
+6 6
+4 11
+样例输出
+YES
+2 3 6
+0 5 1
+1 0 7
+5 0 0
+2 4 0
+1 0 0
+3 0 0
+提示
+
+#include < cstdio >
+#include < cstdlib >
+#include < cstring >
+#include < algorithm >
+using namespace std;
+
+const int maxn = 50005;
+//Tkey为输入主键与辅键的结构体
+//key表示主键，aux表示辅键，index表示是输入的第几个结点
+struct Tkey {
+    int key, aux, index;
+} keys[maxn];
+//Tnode是BST结点的结构体，key表示主键，aux表示辅键
+//father表示父结点的编号，leftChild和rightChild表示左右儿子结点
+struct Tnode {
+    int key, aux, father, leftChild, rightChild;
+} node[maxn];
+int n;
+
+//排序的比较函数
+bool cmp(const Tkey &a, const Tkey &b) {
+    return a.key < b.key;
+}
+
+int main() {
+    //读入数据
+    int i;
+    scanf("%d", &n);
+    for (i = 1; i <= n; ++i) {
+        scanf("%d%d", &keys[i].key, &keys[i].aux);
+        keys[i].index = i;
+    }
+
+    //按key对结点排序
+    sort(keys + 1, keys + n + 1, cmp);
+
+    //按key从小到大将结点插入BST
+    //father表示当前插入结点的父节点，leftChild表示当前插入结点的左儿子节点
+    //rightMost表示每次插入前BST最右的结点
+    int p, father, leftChild, rightMost = 0;
+    for (i = 1; i <= n; ++i) {
+        //寻找插入结点的父亲与左儿子
+        leftChild = 0; father = rightMost;
+        while (father != 0 && _____(1)_____) {
+            leftChild = father;
+            _____(2)_____
+        }
+        //将结点插入BST
+        p = keys[i].index;
+        node[p].key = keys[i].key;
+        node[p].aux = keys[i].aux;
+        node[p].father = father;
+        node[p].leftChild = _____(3)_____;
+        node[p].rightChild = _____(4)_____;
+        if (father != 0)
+            node[father].rightChild = p;
+        if (leftChild != 0)
+            node[leftChild].father = p;
+        _____(5)_____
+    }
+
+    //输出答案
+    printf("YES\n");
+    for (i = 1; i <= n; ++i)
+        printf("%d %d %d\n", node[i].father, node[i].leftChild, node[i].rightChild);
+    return 0;
+}
+来源
+Northeastern Europe 2002, Northern Subregion

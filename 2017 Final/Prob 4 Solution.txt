@@ -1,0 +1,72 @@
+/* Binary Search */
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+#define MAXN 1010
+#define INF 20010
+
+struct coordinate
+{
+	int x, y;
+	coordinate() {}
+	coordinate(int _x, int _y) :x(_x), y(_y) {}
+	friend bool operator< (coordinate a, coordinate b)
+	{
+		if (a.x == b.x)
+			return a.y < b.y;
+		return a.x < b.x;
+	}
+	friend bool operator== (coordinate a, coordinate b)
+	{
+		return a.x == b.x&&a.y == b.y;
+	}
+};
+
+int n;
+coordinate v[MAXN];
+
+bool binsearch(coordinate p)
+{
+	int l = -1, r = n;
+	while (r - l > 1)
+	{
+		int mid = (l + r) / 2;
+		if (v[mid] < p)
+			l = mid;
+		else
+			r = mid;
+	}
+	if (v[r] == p)
+		return 1;
+	return 0;
+}
+
+int main()
+{
+	while (scanf("%d", &n) && n)
+	{
+		for (int i = 0; i < n; i++)
+			scanf("%d%d", &v[i].x, &v[i].y);
+		sort(v, v + n);
+		v[n] = coordinate(INF, INF);
+		int cnt = 0;
+		for (int i = 0; i < n; i++)
+			for (int j = i + 1; j < n; j++)
+			{
+				int a = v[i].x - v[j].x, b = v[i].y - v[j].y;
+				if (binsearch(coordinate(v[i].x + b, v[i].y - a)))
+				{
+					if (binsearch(coordinate(v[j].x + b, v[j].y - a)))
+						cnt++;
+				}
+				if (binsearch(coordinate(v[i].x - b, v[i].y + a)))
+				{
+					if (binsearch(coordinate(v[j].x - b, v[j].y + a)))
+						cnt++;
+				}
+			}
+		printf("%d\n", cnt / 4);
+	}
+	return 0;
+}

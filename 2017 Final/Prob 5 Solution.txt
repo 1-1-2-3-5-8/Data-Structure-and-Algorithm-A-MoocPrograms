@@ -1,0 +1,65 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+const int maxn = 50005;
+//Tkey为输入主键与辅键的结构体
+//key表示主键，aux表示辅键，index表示是输入的第几个结点
+struct Tkey {
+	int key, aux, index;
+} keys[maxn];
+//Tnode是BST结点的结构体，key表示主键，aux表示辅键
+//father表示父结点的编号，leftChild和rightChild表示左右儿子结点
+struct Tnode {
+	int key, aux, father, leftChild, rightChild;
+} node[maxn];
+int n;
+
+//排序的比较函数
+bool cmp(const Tkey &a, const Tkey &b) {
+	return a.key < b.key;
+}
+
+int main() {
+	//读入数据
+	int i;
+	scanf("%d", &n);
+	for (i = 1; i <= n; ++i) {
+		scanf("%d%d", &keys[i].key, &keys[i].aux);
+		keys[i].index = i;
+	}
+
+	//按key对结点排序
+	sort(keys + 1, keys + n + 1, cmp);
+
+	//按key从小到大将结点插入BST
+	//father表示当前插入结点的父节点，leftChild表示当前插入结点的左儿子节点
+	//rightMost表示每次插入前BST最右的结点
+	int p, father, leftChild, rightMost = 0;
+	for (i = 1; i <= n; ++i) {
+		//寻找插入结点的父亲与左儿子
+		leftChild = 0; father = rightMost;
+		while (father != 0 && keys[i].aux < node[father].aux/* (1) */) {
+			leftChild = father;
+			father = node[father].father;/* (2) */
+		}
+		//将结点插入BST
+		p = keys[i].index;
+		node[p].key = keys[i].key;
+		node[p].aux = keys[i].aux;
+		node[p].father = father;
+		node[p].leftChild = leftChild/* (3) */;
+		node[p].rightChild = 0/* (4) */;
+		if (father != 0)
+			node[father].rightChild = p;
+		if (leftChild != 0)
+			node[leftChild].father = p;
+		rightMost = p;/* (5) */
+	}
+
+	//输出答案
+	printf("YES\n");
+	for (i = 1; i <= n; ++i)
+		printf("%d %d %d\n", node[i].father, node[i].leftChild, node[i].rightChild);
+	return 0;
+}

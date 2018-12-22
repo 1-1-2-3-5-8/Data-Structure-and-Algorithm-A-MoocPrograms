@@ -1,0 +1,36 @@
+/* DP */
+#include <iostream>
+using namespace std;
+
+#define MAXN 10010
+#define MAXM 110
+
+int n, m;
+int d[2 * MAXN];
+int f[MAXN];
+
+int main()
+{
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; i++)
+		scanf("%d", d + i);
+	d[0] = 0;
+	for (int i = 1; i <= n; i++)
+		d[i] += d[i - 1];
+	f[0] = 0;
+	for (int i = 1; i <= n; i++)
+	{
+		f[i] = f[i - 1];
+		int s = i - 2, e = i - 1;
+		while (s >= 0)
+		{
+			int dis = d[e] - d[s];
+			if (f[s] + dis > f[i])
+				f[i] = f[s] + dis;
+			s -= 2;
+			e -= 1;
+		}
+	}
+	printf("%d\n", f[n]);
+	return 0;
+}

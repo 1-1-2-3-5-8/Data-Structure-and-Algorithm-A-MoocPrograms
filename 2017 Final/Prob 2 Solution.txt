@@ -1,0 +1,69 @@
+/* DP */
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+#define MAXN 2010
+
+int a[5][MAXN];//以c[1]第j位结尾的c[1]和c[i]的最长公共子串
+int m[MAXN];
+int dp[MAXN][MAXN];
+char c[5][MAXN];
+int n;
+int len;
+
+/* 这一部分也可以用KMP完成，复杂度从O(l^2)降为O(l) */
+void dp1i(int index)
+{
+	int leni = strlen(c[index]);
+	for (int i = 0; i < len; i++)
+		dp[i][0] = (c[0][i] == c[index][0]);
+	a[index][0] = 0;
+	for (int i = 0; i < leni; i++)
+	{
+		dp[0][i] = (c[0][0] == c[index][i]);
+		if (dp[0][i])
+			a[index][0] = 1;
+	}
+	for (int i = 1; i < len; i++)
+	{
+		int max = dp[i][0];
+		for (int j = 1; j < leni; j++)
+		{
+			if (c[0][i] == c[index][j])
+				dp[i][j] = dp[i - 1][j - 1] + 1;
+			else
+				dp[i][j] = 0;
+			if (dp[i][j] > max)
+				max = dp[i][j];
+		}
+		a[index][i] = max;
+	}
+}
+
+int main()
+{
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++)
+		scanf("%s", c[i]);
+	len = strlen(c[0]);
+	for (int i = 1; i < n; i++)
+		dp1i(i);
+	int max = 0;
+	for (int i = 0; i < len; i++)
+	{
+		m[i] = MAXN;
+		for (int j = 1; j < n; j++)
+		{
+			if (a[j][i] < m[i])
+				m[i] = a[j][i];
+		}
+		if (m[i] > max)
+			max = m[i];
+	}
+	if (max < MAXN)
+		printf("%d\n", max);
+	else
+		printf("%d\n", len);
+	return 0;
+}

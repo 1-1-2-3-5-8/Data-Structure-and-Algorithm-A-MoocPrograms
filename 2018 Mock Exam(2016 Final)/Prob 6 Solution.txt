@@ -1,0 +1,72 @@
+/* Priority Queue */
+#include <iostream>
+#include <queue>
+using namespace std;
+
+#define MAXN 1000010
+
+struct node
+{
+	int k;
+	int p;
+	node(int id, int pr) :k(id), p(pr) {}
+	friend bool operator< (node a, node b)
+	{
+		return a.p < b.p;
+	}
+	friend bool operator> (node a, node b)
+	{
+		return a.p > b.p;
+	}
+};
+
+typedef priority_queue<node, vector<node>, less<node> > maxqueue;
+typedef priority_queue<node, vector<node>, greater<node> > minqueue;
+
+int client[MAXN] = {};
+minqueue minq;
+maxqueue maxq;
+
+
+int main()
+{
+	int req, c, prio;
+	while (scanf("%d", &req) && req)
+	{
+		switch (req)
+		{
+		case 1:
+			scanf("%d%d", &c, &prio);
+			client[c]++;
+			maxq.push(node(c, prio));
+			minq.push(node(c, prio));
+			break;
+		case 2:
+			while (!maxq.empty() && !client[maxq.top().k])
+				maxq.pop();
+			if (maxq.empty())
+				printf("0\n");
+			else
+			{
+				c = maxq.top().k;
+				maxq.pop();
+				client[c]--;
+				printf("%d\n", c);
+			}
+			break;
+		case 3:
+			while (!minq.empty() && !client[minq.top().k])
+				minq.pop();
+			if (minq.empty())
+				printf("0\n");
+			else
+			{
+				c = minq.top().k;
+				minq.pop();
+				client[c]--;
+				printf("%d\n", c);
+			}
+		}
+	}
+	return 0;
+}

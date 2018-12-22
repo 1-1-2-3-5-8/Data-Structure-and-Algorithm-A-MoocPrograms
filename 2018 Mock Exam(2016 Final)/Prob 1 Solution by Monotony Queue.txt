@@ -1,0 +1,64 @@
+/* 单调队列 */
+#include <iostream>
+#include <vector>
+#include <deque>
+using namespace std;
+
+struct node
+{
+	int value;
+	int index;
+	node(int v, int i) :value(v), index(i) {}
+	friend bool operator<= (node a, node b)
+	{
+		return a.value <= b.value;
+	}
+	friend bool operator>= (node a, node b)
+	{
+		return a.value >= b.value;
+	}
+};
+
+deque<node> maxl;
+deque<node> minl;
+vector<int> maxv;
+
+int main()
+{
+	int n, k;
+	scanf("%d%d", &n, &k);
+	int input;
+	for (int i = 0; i < k; i++)
+	{
+		scanf("%d", &input);
+		while (!minl.empty() && minl.back() >= node(input, i))
+			minl.pop_back();
+		minl.push_back(node(input, i));
+		while (!maxl.empty() && maxl.back() <= node(input, i))
+			maxl.pop_back();
+		maxl.push_back(node(input, i));
+	}
+	for (int i = k; i < n; i++)
+	{
+		node f = maxl.front();
+		maxv.push_back(f.value);
+		if (f.index <= i - k)
+			maxl.pop_front();
+		f = minl.front();
+		printf("%d ", f.value);
+		if (f.index <= i - k)
+			minl.pop_front();
+		scanf("%d", &input);
+		while (!minl.empty() && minl.back() >= node(input, i))
+			minl.pop_back();
+		minl.push_back(node(input, i));
+		while (!maxl.empty() && maxl.back() <= node(input, i))
+			maxl.pop_back();
+		maxl.push_back(node(input, i));
+	}
+	printf("%d\n", minl.front().value);
+	for (int i = k; i < n; i++)
+		printf("%d ", maxv[i - k]);
+	printf("%d\n", maxl.front().value);
+	return 0;
+}
