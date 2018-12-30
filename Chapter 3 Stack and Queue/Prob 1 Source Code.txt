@@ -1,0 +1,158 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+#define msize 1000
+
+template<class T>
+class stack
+{
+public:
+	bool empty()
+	{
+		return size < 0;
+	}
+	void push(T item)
+	{
+		s[++size] = item;
+	}
+	T top()
+	{
+		return s[size];
+	}
+	T pop()
+	{
+		return s[size--];
+	}
+	stack() :size(-1) {}
+private:
+	int size;
+	T s[msize];
+};
+
+stack<char> op;
+stack<int> n;
+
+int trans(char *s)
+{
+	int len = strlen(s);
+	int pow = 1;
+	int res = 0;
+	while (len--)
+	{
+		res += pow * (s[len] - '0');
+		pow *= 10;
+	}
+	return res;
+}
+
+int power(int x, int y)
+{
+	int res = 1;
+	while (y--)
+		res *= x;
+	return res;
+}
+
+bool cal()
+{
+	char ope = op.pop();
+	if (ope == '(')
+		return 0;
+	int x = n.pop(), y = n.pop();
+	switch (ope)
+	{
+	case '+':
+		n.push(x + y);
+		break;
+	case '-':
+		n.push(y - x);
+		break;
+	case '*':
+		n.push(x*y);
+		break;
+	case '/':
+		n.push(y / x);
+		break;
+	default://case '^':
+		n.push(power(y, x));
+	}
+	return 1;
+}
+
+int main()
+{
+	op.push('(');
+	char str[100];
+	while (cin >> str)
+	{
+		if (str[0] >= '0'&&str[0] <= '9')
+			n.push(trans(str));
+		else
+		{
+			char ch = str[0];
+			char t;
+			switch (ch)
+			{
+			case '(':
+				op.push(ch);
+				break;
+			case '^':
+				op.push(ch);
+				break;
+			case '*':
+				t = op.top();
+				while (t == '^' || t == '*' || t == '/')
+				{
+					cal();
+					t = op.top();
+				}
+				op.push(ch);
+				break;
+			case '/':
+				t = op.top();
+				while (t == '^' || t == '*' || t == '/')
+				{
+					cal();
+					t = op.top();
+				}
+				op.push(ch);
+				break;
+			case '+':
+				t = op.top();
+				while (t != '(')
+				{
+					cal();
+					t = op.top();
+				}
+				op.push(ch);
+				break;
+			case '-':
+				t = op.top();
+				while (t != '(')
+				{
+					cal();
+					t = op.top();
+				}
+				op.push(ch);
+				break;
+			default://case ')':
+				t = op.top();
+				while (t != '(')
+				{
+					cal();
+					t = op.top();
+				}
+				op.pop();//pop left bracket
+			}
+		}
+	}
+	char t = op.top();
+	while (t != '(')
+	{
+		cal();
+		t = op.top();
+	}
+	printf("%d\n", n.top());
+	return 0;
+}

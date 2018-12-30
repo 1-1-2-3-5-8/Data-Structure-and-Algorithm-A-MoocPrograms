@@ -1,0 +1,49 @@
+#include <iostream>
+using namespace std;
+
+struct node
+{
+	node(char _c) :ch(_c), next(NULL) {}
+	char ch;
+	node *next;
+};
+
+node *create()
+{
+	char c;
+	node *head = new node(0), *tail = head;
+	while (scanf("%c", &c) && c != ' '&&c != '\0'&&c != '\n')
+	{
+		tail->next = new node(c);
+		tail = tail->next;
+	}
+	return head;
+}
+
+int main()
+{
+	node *str = create(), *sub = create();
+	node *move = str, *maxi = str;
+	while (move)
+	{
+		if (move->ch > maxi->ch)
+			maxi = move;
+		move = move->next;
+	}
+	move = sub;
+	while (move->next)
+		move = move->next;
+	move->next = maxi->next;
+	maxi->next = sub->next;
+	move = str->next;
+	delete str;
+	while (move)
+	{
+		printf("%c", move->ch);
+		str = move;
+		move = move->next;
+		delete str;
+	}
+
+	return 0;
+}

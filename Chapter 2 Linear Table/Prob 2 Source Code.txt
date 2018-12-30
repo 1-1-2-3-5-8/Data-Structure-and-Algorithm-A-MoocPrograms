@@ -1,0 +1,33 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+int main()
+{
+	char a[300] = {}, b[300] = {};
+	int res[500] = {};
+	scanf("%s%s", a, b);
+	int lena = strlen(a), lenb = strlen(b);
+	for (int i = 0; i < lena + lenb; i++)
+	{
+		int sum = res[i];
+		for (int j = 0; j <= lena - 1 && j <= i; j++)
+		{
+			if (i - j <= lenb - 1)
+				sum += (a[lena - 1 - j] - '0')*(b[lenb - 1 - (i - j)] - '0');
+		}
+		res[i] = sum % 10;
+		res[i + 1] = sum / 10;
+	}
+	int highest = lena + lenb;
+	while (!res[highest])
+		highest--;
+	if (highest < 0)
+		printf("0\n");
+	while (highest >= 0)
+	{
+		printf("%d", res[highest]);
+		highest--;
+	}
+	return 0;
+}

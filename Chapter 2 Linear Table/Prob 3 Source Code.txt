@@ -1,0 +1,52 @@
+#include <iostream>
+using namespace std;
+
+struct node
+{
+	node(int _n) :no(_n), next(NULL) {}
+	int no;
+	node *next;
+};
+
+node *create(int n)
+{
+	node *head = new node(1), *tail = head;
+	for (int i = 2; i <= n; i++)
+	{
+		tail->next = new node(i);
+		tail = tail->next;
+	}
+	tail->next = head;
+	return tail;
+}
+
+node *del(node *next)
+{
+	node *now = next->next, *rec = next;
+	next->next = now->next;
+	delete now;
+	return rec;
+}
+
+int main()
+{
+	int n, m;
+	scanf("%d%d", &n, &m);
+	node *start = create(n);
+	int cnt = 0;
+	int out = 0;
+	while (out < n - 1)
+	{
+		while (cnt < m - 1)
+		{
+			cnt++;
+			start = start->next;
+		}
+		start = del(start);
+		out++;
+		cnt = 0;
+	}
+	printf("%d\n", start->no);
+	delete start;
+	return 0;
+}

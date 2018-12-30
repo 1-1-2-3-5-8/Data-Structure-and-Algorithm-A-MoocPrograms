@@ -1,0 +1,80 @@
+1中缀表达式求值（8分）
+题目内容：
+
+通过把“中缀转后缀”和“后缀求值”两个算法功能集成在一起（非简单的顺序调用），
+
+实现对中缀表达式直接求值，新算法还是从左到右扫描中缀表达式，
+
+但同时使用两个栈，一个暂存操作符，一个暂存操作数，来进行求值。
+
+(支持 + - * / ^ 五种运算）
+
+
+
+输入格式:
+
+共1行，为1个字符串，即一个中缀表达式，
+
+其中每个数字或符号间由一个空格隔开。
+
+
+
+输出格式：
+
+共1行，为一个整数，即求值的结果。
+
+
+
+输入样例：
+
+( 2 + 3 ) * 6 + 4 / 2
+
+
+
+输出样例：
+
+32
+
+
+
+附Python模板：
+
+class Stack:
+
+    def __init__(self):
+
+        self.items = []
+
+    def isEmpty(self):
+
+        return self.items == []
+
+    def push(self, item):
+
+        self.items.append(item)
+
+    def pop(self):
+
+        return self.items.pop()
+
+    def peek(self):
+
+        return self.items[len(self.items)-1]
+
+    def size(self):
+
+        return len(self.items)
+
+def calculate(s):
+
+    # 请在此编写你的代码（可删除pass语句）
+
+    pass
+
+    # 代码结束
+
+print(calculate(input()))
+
+
+
+时间限制：500ms内存限制：32000kb

@@ -1,0 +1,66 @@
+#include <iostream>
+#include <string.h>
+using namespace std;
+
+#define N 60
+#define MAXLEN 100
+
+char hw[N][MAXLEN];
+char p[MAXLEN];
+int len;
+
+bool match(char p, char h)
+{
+	if (p >= 'a'&&p <= 'z')
+		return (p == h) || (p == h - 'A' + 'a');
+	if (p >= 'A'&&p <= 'Z')
+		return (p == h) || (p == h - 'a' + 'A');
+	return p == h;
+}
+
+bool ok(int n)
+{
+	int i = 0, j = 0;
+	int hwlen = strlen(hw[n]);
+	while (i < len)
+	{
+		if (j >= hwlen)
+			return 0;
+		if (p[i] == '[')
+		{
+			bool done = 0;
+			while (p[i] != ']')
+			{
+				i++;
+				if (!done&&match(p[i], hw[n][j]))
+					done = 1;
+			}
+			if (!done)
+				return 0;
+		}
+		else
+		{
+			if (!match(p[i], hw[n][j]))
+				return 0;
+		}
+		i++;
+		j++;
+	}
+	return 1;
+}
+
+int main()
+{
+	int n;
+	cin >> n;
+	for (int i = 1; i <= n; i++)
+		cin >> hw[i];
+	cin >> p;
+	len = strlen(p);
+	for (int i = 1; i <= n; i++)
+	{
+		if (ok(i))
+			cout << i << " " << hw[i] << endl;
+	}
+	return 0;
+}
