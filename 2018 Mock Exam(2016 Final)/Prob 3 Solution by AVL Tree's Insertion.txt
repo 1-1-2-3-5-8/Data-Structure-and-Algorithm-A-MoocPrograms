@@ -1,0 +1,211 @@
+/* AVL树的查找与插入 */
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+
+#define MAXL 20
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+typedef enum { L, R } CHILDPOS;
+
+struct node
+{
+	node* parent, *child[2];
+	int h;
+	CHILDPOS pos;
+	char key[MAXL];
+	char word[MAXL];
+	node(const char* k, const char* w, CHILDPOS p) :
+		parent(NULL), child{}, h(1), pos(p)
+	{
+		strcpy(key, k);
+		strcpy(word, w);
+	}
+	int bf()
+	{
+		int l = child[0] ? child[0]->h : 0;
+		int r = child[1] ? child[1]->h : 0;
+		return r - l;
+	}
+	void seth()
+	{
+		int l = child[0] ? child[0]->h : 0;
+		int r = child[1] ? child[1]->h : 0;
+		h = MAX(l, r) + 1;
+	}
+	void del()
+	{
+		if (child[0])
+			child[0]->del();
+		if (child[1])
+			child[1]->del();
+		delete this;
+	}
+};
+
+struct tree
+{
+	node* root;
+	tree() :root(NULL) {}
+	~tree()
+	{
+		root->del();
+	}
+	char* find(const char* key)
+	{
+		node* mov = root;
+		while (mov)
+		{
+			int res = strcmp(mov->key, key);
+			if (!res)
+				return mov->word;
+			if (res < 0)
+				mov = mov->child[0];
+			else
+				mov = mov->child[1];
+		}
+		return NULL;
+	}
+	bool AVLfind(const char* key, node* &par, CHILDPOS &p)
+	{
+		node* mov = root;
+		while (mov)
+		{
+			int res = strcmp(mov->key, key);
+			par = mov;
+			if (!res)
+				return 1;
+			if (res < 0)
+			{
+				mov = mov->child[0];
+				p = L;
+			}
+			else
+			{
+				mov = mov->child[1];
+				p = R;
+			}
+		}
+		return 0;
+	}
+	bool insert(const char* key, const char* word)
+	{
+		if (!root)
+		{
+			root = new node(key, word, L);
+			return 1;
+		}
+		node* par;
+		CHILDPOS p;
+		bool succ = AVLfind(key, par, p);
+		if (succ)
+			return 0;
+		node* son = new node(key, word, p);
+		par->child[p] = son;
+		par->h = 2;
+		son->parent = par;
+		son->pos = p;
+		node* grandpar = par->parent;
+		while (grandpar)
+		{
+			node** ggparcd = &root;
+			if (grandpar != root)
+				ggparcd = &grandpar->parent->child[grandpar->pos];
+			node* ggpar = grandpar->parent;
+			if (grandpar->bf() > 1 || grandpar->bf() < -1)
+			{
+				CHILDPOS inspos = grandpar->bf() > 1 ? R : L,
+					oppopos = (inspos == L ? R : L);
+				CHILDPOS ggpos = grandpar->pos;
+				//RR or LL style
+				if (p == inspos)
+				{
+					//par becomes ggpar's child
+					*ggparcd = par;
+					par->pos = ggpos;
+					//par's the other child becomes grandpar's inspos child
+					grandpar->child[inspos] = par->child[oppopos];
+					if (par->child[oppopos])
+					{
+						par->child[oppopos]->parent = grandpar;
+						par->child[oppopos]->pos = inspos;
+					}
+					grandpar->seth();
+					//grandpar becomes par's oppopos son
+					par->child[oppopos] = grandpar;
+					grandpar->parent = par;
+					grandpar->pos = oppopos;
+					par->parent = ggpar;
+					par->seth();
+				}
+				//LR or RL style
+				else
+				{
+					//move son's oppopos child to grandpar's inspos
+					grandpar->child[inspos] = son->child[oppopos];
+					if (son->child[oppopos])
+					{
+						son->child[oppopos]->parent = grandpar;
+						son->child[oppopos]->pos = inspos;
+					}
+					grandpar->seth();
+					//move son's inspos child to par's oppopos
+					par->child[oppopos] = son->child[inspos];
+					if (son->child[inspos])
+					{
+						son->child[inspos]->parent = par;
+						son->child[inspos]->pos = oppopos;
+					}
+					par->seth();
+					//lift up son
+					*ggparcd = son;
+					grandpar->parent = par->parent = son;
+					grandpar->pos = oppopos;
+					par->pos = inspos;
+					son->child[oppopos] = grandpar;
+					son->child[inspos] = par;
+					son->parent = ggpar;
+					son->pos = ggpos;
+					son->seth();
+				}
+				return 1;
+			}
+			//iterate
+			grandpar->seth();
+			son = par;
+			p = par->pos;
+			par = grandpar;
+			grandpar = grandpar->parent;
+		}
+		return 1;
+	}
+};
+
+tree dic;
+
+int main()
+{
+	char input[MAXL];
+	char c;
+	while (scanf("%s", input))
+	{
+		if (scanf("%c", &c) && c == '\n')
+			break;
+		char key[MAXL];
+		scanf("%s", key);
+		dic.insert(key, input);
+	}
+	char* res = dic.find(input);
+	if (res)
+		printf("%s\n", res);
+	else
+		printf("eh\n");
+	while (scanf("%s", input) > 0)
+	{
+		res = dic.find(input);
+		if (res)
+			printf("%s\n", res);
+		else
+			printf("eh\n");
+	}
+	return 0;
+}
